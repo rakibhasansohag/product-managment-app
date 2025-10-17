@@ -6,6 +6,7 @@ import { logout } from '@/redux/features/authSlice';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import toast from 'react-hot-toast';
 
 export default function Sidebar() {
 	const dispatch = useDispatch();
@@ -39,6 +40,8 @@ export default function Sidebar() {
 	const handleLogout = () => {
 		dispatch(logout());
 		document.cookie = 'token=; path=/; max-age=0';
+		toast.success('Logged out successfully');
+		window.location.href = '/login';
 	};
 
 	const SidebarContent = () => (
