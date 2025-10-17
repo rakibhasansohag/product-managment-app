@@ -13,6 +13,10 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import GlobalLoading from '@/components/globalLoading';
 import ConfirmDialog from '@/components/shared/confirmDialog';
+import { productApi } from '@/redux/features/productApi';
+import { useAppDispatch } from '@/redux/hooks';
+
+// TODO  : Lets' remove the any type from those pages and types
 
 export default function EditProductPage({
 	params,
@@ -24,6 +28,7 @@ export default function EditProductPage({
 	const { data: product, isLoading, isError } = useGetProductByIdQuery(id);
 	const [update] = useUpdateProductMutation();
 	const router = useRouter();
+	const dispatch = useAppDispatch();
 
 	// confirmation flow state
 	const [confirmOpen, setConfirmOpen] = useState(false);
@@ -55,7 +60,6 @@ export default function EditProductPage({
 
 	const confirmAndSave = useCallback(async () => {
 		if (!pendingPayload || !product) {
-			// nothing to save
 			setConfirmOpen(false);
 			submitResolver?.();
 			return;
@@ -63,27 +67,76 @@ export default function EditProductPage({
 
 		setConfirmLoading(true);
 		try {
-			await update({ id: product.id, ...pendingPayload }).unwrap();
+			const updated = await update({
+				id: product.id,
+				...pendingPayload,
+			}).unwrap();
+
+			// success toast
 			toast.success('Product updated successfully!');
 
-			console.log('Product updated successfully!', product);
+			try {
+				dispatch(
+					productApi.util.updateQueryData(
+						'getProductById',
+						updated.id,
+						(draft) => {
+							Object.assign(draft, updated);
+						},
+					),
+				);
+			} catch (e) {
+				// ignore
+			}
+
+			if (updated.slug) {
+				try {
+					dispatch(
+						productApi.util.updateQueryData(
+							'getProductBySlug',
+							updated.slug,
+							(draft) => {
+								Object.assign(draft, updated);
+							},
+						),
+					);
+				} catch (e) {
+					// ignore
+				}
+			}
+
+			dispatch(
+				productApi.util.invalidateTags([{ type: 'Product', id: 'LIST' }]),
+			);
+
+			// resolve the pending form submit
 			submitResolver?.();
-			// close dialog then navigate to details page
+
+			// close dialog and navigate to the new slug
 			setConfirmOpen(false);
-			router.push(`/products/${product.slug ?? product.id}`);
+			const destination = updated.slug
+				? `/products/${updated.slug}`
+				: `/products/${updated.id}`;
+			router.push(destination);
 		} catch (err) {
 			console.error('Update error:', err);
 			toast.error('Failed to update product');
-
 			submitRejecter?.(err);
 		} finally {
 			setConfirmLoading(false);
-			// cleanup pending payload / resolvers after a tick
 			setPendingPayload(null);
 			setSubmitResolver(null);
 			setSubmitRejecter(null);
 		}
-	}, [pendingPayload, product, update, router, submitResolver, submitRejecter]);
+	}, [
+		pendingPayload,
+		product,
+		submitResolver,
+		update,
+		dispatch,
+		router,
+		submitRejecter,
+	]);
 
 	const cancelConfirm = useCallback(() => {
 		setConfirmOpen(false);

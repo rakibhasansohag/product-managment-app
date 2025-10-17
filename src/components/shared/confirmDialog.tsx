@@ -36,10 +36,7 @@ export default function ConfirmDialog({
 				<div className='fixed inset-0 z-50 flex items-end md:items-center justify-center'>
 					<Dialog.Overlay className='fixed inset-0 bg-black/40 backdrop-blur-sm' />
 
-					<Dialog.Content
-						className='z-60 relative w-full max-w-lg bg-white rounded-lg shadow-xl mx-4 md:mx-0 p-6'
-						// you can remove aria-labelledby/aria-describedby if using Title/Description
-					>
+					<Dialog.Content className='z-60 relative w-full max-w-lg bg-white rounded-lg shadow-xl mx-4 md:mx-0 p-6'>
 						{/* make title and description direct children of Dialog.Content */}
 						<Dialog.Title className='text-lg font-medium text-slate-900'>
 							{title}
@@ -48,7 +45,7 @@ export default function ConfirmDialog({
 							{description}
 						</Dialog.Description>
 
-						{/* close button (position absolute) */}
+						{/* close button */}
 						<button
 							aria-label='Close'
 							onClick={() => {

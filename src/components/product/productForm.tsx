@@ -8,7 +8,7 @@ import { uploadToCloudinary } from '@/lib/cloudinary';
 import { useGetCategoriesQuery } from '@/redux/features/productApi';
 import toast from 'react-hot-toast';
 import type { Category } from '@/types/product';
-import Image from 'next/image';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
