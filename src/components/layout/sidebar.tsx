@@ -6,12 +6,13 @@ import { logout } from '@/redux/features/authSlice';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import toast from 'react-hot-toast';
+import ConfirmDialog from '../shared/confirmDialog';
 
 export default function Sidebar() {
 	const dispatch = useDispatch();
 	const pathname = usePathname();
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+	const [logoutOpen, setLogoutOpen] = useState(false);
 
 	// Close mobile menu on route change
 	useEffect(() => {
@@ -35,13 +36,6 @@ export default function Sidebar() {
 			return pathname === '/products';
 		}
 		return pathname === path;
-	};
-
-	const handleLogout = () => {
-		dispatch(logout());
-		document.cookie = 'token=; path=/; max-age=0';
-		toast.success('Logged out successfully');
-		window.location.href = '/login';
 	};
 
 	const SidebarContent = () => (
@@ -89,7 +83,7 @@ export default function Sidebar() {
 			{/* Logout Button */}
 			<div className='p-4 border-t border-slate-200'>
 				<Button
-					onClick={handleLogout}
+					onClick={() => setLogoutOpen(true)}
 					variant='ghost'
 					className='w-full justify-start text-red-600 hover:bg-red-50 hover:text-red-700'
 				>
@@ -143,6 +137,20 @@ export default function Sidebar() {
 				</div>
 				<SidebarContent />
 			</aside>
+
+			<ConfirmDialog
+				open={logoutOpen}
+				onOpenChange={setLogoutOpen}
+				title='Log out?'
+				description='You will be logged out of the dashboard. Continue?'
+				confirmLabel='Log out'
+				cancelLabel='Cancel'
+				intent='default'
+				onConfirm={() => {
+					dispatch(logout());
+				}}
+				onCancel={() => setLogoutOpen(false)}
+			/>
 		</>
 	);
 }

@@ -16,9 +16,17 @@ export default function ProductCard({
 		<div className='bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-200 group'>
 			{/* Image */}
 			<div className='relative h-48 overflow-hidden bg-slate-100'>
-				<Image
-					width={500}
-					height={500}
+				{/* ERROR : Remoed the next js image cuz  of the lot of domain coming in the server and also there is this image doamin that code buggeed 
+				
+				{
+				protocol: 'https',
+				hostname: 'letsenhance.io',
+				port: '',
+				pathname: '/**',
+			},
+				*/}
+
+				<img
 					src={product.images?.[0] ?? '/placeholder.png'}
 					alt={product.name}
 					className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-300'

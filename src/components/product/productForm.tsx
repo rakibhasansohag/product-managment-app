@@ -287,9 +287,18 @@ export default function ProductForm({
 							</div>
 						) : (
 							<div className='relative rounded-lg overflow-hidden border border-slate-200'>
-								<Image
-									width={500}
-									height={300}
+								{/* ERROR : Remoed the next js image cuz  of the lot of domain coming in the server and also there is this image doamin that code buggeed 
+				
+				{
+				protocol: 'https',
+				hostname: 'letsenhance.io',
+				port: '',
+				pathname: '/**',
+			},
+				*/}
+								<img
+									// width={500}
+									// height={300}
 									src={preview}
 									className='w-full h-64 object-cover'
 									alt='Product preview'

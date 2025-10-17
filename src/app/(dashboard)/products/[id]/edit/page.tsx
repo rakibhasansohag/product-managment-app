@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import ProductForm from '@/components/product/productForm';
 import {
 	useGetProductByIdQuery,
@@ -7,10 +8,11 @@ import {
 } from '@/redux/features/productApi';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { ArrowLeft,  TriangleAlert } from 'lucide-react';
+import { ArrowLeft, TriangleAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import GlobalLoading from '@/components/globalLoading';
+import ConfirmDialog from '@/components/shared/confirmDialog';
 
 export default function EditProductPage({
 	params,
@@ -22,6 +24,77 @@ export default function EditProductPage({
 	const { data: product, isLoading, isError } = useGetProductByIdQuery(id);
 	const [update] = useUpdateProductMutation();
 	const router = useRouter();
+
+	// confirmation flow state
+	const [confirmOpen, setConfirmOpen] = useState(false);
+	const [confirmLoading, setConfirmLoading] = useState(false);
+	const [pendingPayload, setPendingPayload] = useState<Record<
+		string,
+		any
+	> | null>(null);
+
+	// resolver for the promise returned to ProductForm
+	const [submitResolver, setSubmitResolver] = useState<
+		((value?: void | PromiseLike<void>) => void) | null
+	>(null);
+	const [submitRejecter, setSubmitRejecter] = useState<
+		((reason?: any) => void) | null
+	>(null);
+
+	const handleFormSubmit = useCallback(
+		(payload: Record<string, any>) =>
+			new Promise<void>((resolve, reject) => {
+				// save payload then open confirm dialog
+				setPendingPayload(payload);
+				setSubmitResolver(() => resolve);
+				setSubmitRejecter(() => reject);
+				setConfirmOpen(true);
+			}),
+		[],
+	);
+
+	const confirmAndSave = useCallback(async () => {
+		if (!pendingPayload || !product) {
+			// nothing to save
+			setConfirmOpen(false);
+			submitResolver?.();
+			return;
+		}
+
+		setConfirmLoading(true);
+		try {
+			await update({ id: product.id, ...pendingPayload }).unwrap();
+			toast.success('Product updated successfully!');
+
+			console.log('Product updated successfully!', product);
+			submitResolver?.();
+			// close dialog then navigate to details page
+			setConfirmOpen(false);
+			router.push(`/products/${product.slug ?? product.id}`);
+		} catch (err) {
+			console.error('Update error:', err);
+			toast.error('Failed to update product');
+
+			submitRejecter?.(err);
+		} finally {
+			setConfirmLoading(false);
+			// cleanup pending payload / resolvers after a tick
+			setPendingPayload(null);
+			setSubmitResolver(null);
+			setSubmitRejecter(null);
+		}
+	}, [pendingPayload, product, update, router, submitResolver, submitRejecter]);
+
+	const cancelConfirm = useCallback(() => {
+		setConfirmOpen(false);
+
+		submitRejecter?.(new Error('User cancelled'));
+
+		// cleanup
+		setPendingPayload(null);
+		setSubmitResolver(null);
+		setSubmitRejecter(null);
+	}, [submitRejecter]);
 
 	if (isLoading) {
 		return <GlobalLoading />;
@@ -60,6 +133,7 @@ export default function EditProductPage({
 						<ArrowLeft />
 					</Link>
 				</Button>
+
 				<div>
 					<h1 className='text-3xl font-bold text-slate-800'>Edit Product</h1>
 					<p className='text-slate-500 mt-1'>
@@ -79,19 +153,29 @@ export default function EditProductPage({
 						images: product.images ?? undefined,
 						categoryId: product.category?.id ?? '',
 					}}
-					onSubmit={async (payload) => {
-						try {
-							await update({ id: product.id, ...payload }).unwrap();
-							toast.success('Product updated successfully!');
-							router.push(`/products/${product.slug ?? product.id}`);
-						} catch (err) {
-							console.error('Update error:', err);
-							toast.error('Failed to update product');
-						}
-					}}
+					// instead of immediately updating, we open confirmation first
+					onSubmit={handleFormSubmit}
 					submitLabel='Update Product'
 				/>
 			</div>
+
+			{/* Confirm dialog shown when form submits */}
+			<ConfirmDialog
+				open={confirmOpen}
+				onOpenChange={(v) => {
+					// if user closes via overlay/esc key, treat as cancel
+					if (!v) cancelConfirm();
+					setConfirmOpen(v);
+				}}
+				title='Save changes?'
+				description='Are you sure you want to save these changes to the product?'
+				confirmLabel='Save'
+				cancelLabel='Cancel'
+				intent='default'
+				loading={confirmLoading}
+				onConfirm={confirmAndSave}
+				onCancel={cancelConfirm}
+			/>
 		</div>
 	);
 }

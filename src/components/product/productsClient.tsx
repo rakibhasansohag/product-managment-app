@@ -55,7 +55,9 @@ export default function ProductsClient() {
 			await deleteProduct(id).unwrap();
 			toast.success('Product deleted successfully');
 			refetch();
+
 			setConfirmOpen(false);
+			setSelectedId(null);
 		} catch (err) {
 			toast.error('Failed to delete product');
 		}
@@ -184,10 +186,20 @@ export default function ProductsClient() {
 
 			<ConfirmDialog
 				open={confirmOpen}
+				onOpenChange={setConfirmOpen}
 				title='Delete Product'
-				message='Are you sure you want to delete this product? This action cannot be undone.'
-				onCancel={() => setConfirmOpen(false)}
-				onConfirm={() => selectedId && handleDelete(selectedId)}
+				description='Are you sure you want to delete this product? This action cannot be undone.'
+				confirmLabel='Delete'
+				cancelLabel='Cancel'
+				intent='danger'
+				onConfirm={async () => {
+					if (!selectedId) return;
+					await handleDelete(selectedId);
+				}}
+				onCancel={() => {
+					setConfirmOpen(false);
+					setSelectedId(null);
+				}}
 			/>
 		</div>
 	);

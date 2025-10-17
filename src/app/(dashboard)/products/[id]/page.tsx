@@ -26,12 +26,21 @@ export default function ProductDetails({
 
 	return (
 		<div className='max-w-3xl'>
-			<Image
+			{/* ERROR : Remoed the next js image cuz  of the lot of domain coming in the server and also there is this image doamin that code buggeed 
+				
+				{
+				protocol: 'https',
+				hostname: 'letsenhance.io',
+				port: '',
+				pathname: '/**',
+			},
+				*/}
+			<img
 				src={product.images?.[0] ?? '/placeholder.png'}
 				className='w-full h-64 object-cover rounded'
 				alt={product.name}
-				width={500}
-				height={500}
+				// width={500}
+				// height={500}
 			/>
 			<div className='mt-4'>
 				<h2 className='text-2xl font-semibold'>{product.name}</h2>

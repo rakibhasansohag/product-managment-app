@@ -1,39 +1,100 @@
 'use client';
+
+import * as Dialog from '@radix-ui/react-dialog';
+import { X } from 'lucide-react';
 import React from 'react';
+import { Button } from '@/components/ui/button';
+
+type ConfirmDialogProps = {
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+	title?: React.ReactNode;
+	description?: React.ReactNode;
+	confirmLabel?: string;
+	cancelLabel?: string;
+	intent?: 'danger' | 'default';
+	loading?: boolean;
+	onConfirm: () => Promise<void> | void;
+	onCancel?: () => void;
+};
 
 export default function ConfirmDialog({
 	open,
-	title,
-	message,
-	onCancel,
+	onOpenChange,
+	title = 'Confirm',
+	description = 'Are you sure?',
+	confirmLabel = 'Confirm',
+	cancelLabel = 'Cancel',
+	intent = 'danger',
+	loading = false,
 	onConfirm,
-}: {
-	open: boolean;
-	title?: string;
-	message?: string;
-	onCancel: () => void;
-	onConfirm: () => void;
-}) {
-	if (!open) return null;
+	onCancel,
+}: ConfirmDialogProps) {
 	return (
-		<div className='fixed inset-0 z-40 flex items-center justify-center bg-black/40'>
-			<div className='bg-white p-6 rounded shadow max-w-md w-full'>
-				<h3 className='font-semibold text-lg'>{title ?? 'Confirm'}</h3>
-				<p className='mt-2 text-sm text-gray-600'>
-					{message ?? 'Are you sure?'}
-				</p>
-				<div className='mt-4 flex justify-end gap-2'>
-					<button onClick={onCancel} className='px-4 py-2 rounded border'>
-						Cancel
-					</button>
-					<button
-						onClick={onConfirm}
-						className='px-4 py-2 rounded bg-red-600 text-white'
+		<Dialog.Root open={open} onOpenChange={onOpenChange}>
+			<Dialog.Portal>
+				<div className='fixed inset-0 z-50 flex items-end md:items-center justify-center'>
+					<Dialog.Overlay className='fixed inset-0 bg-black/40 backdrop-blur-sm' />
+
+					<Dialog.Content
+						className='z-60 relative w-full max-w-lg bg-white rounded-lg shadow-xl mx-4 md:mx-0 p-6'
+						// you can remove aria-labelledby/aria-describedby if using Title/Description
 					>
-						Confirm
-					</button>
+						{/* make title and description direct children of Dialog.Content */}
+						<Dialog.Title className='text-lg font-medium text-slate-900'>
+							{title}
+						</Dialog.Title>
+						<Dialog.Description className='text-sm text-slate-600 mt-1'>
+							{description}
+						</Dialog.Description>
+
+						{/* close button (position absolute) */}
+						<button
+							aria-label='Close'
+							onClick={() => {
+								onOpenChange(false);
+								onCancel?.();
+							}}
+							className='absolute right-3 top-3 p-1 rounded hover:bg-gray-100'
+							type='button'
+						>
+							<X size={16} />
+						</button>
+
+						{/* actions */}
+						<div className='mt-6 flex justify-end gap-3'>
+							<Button
+								variant='ghost'
+								onClick={() => {
+									onOpenChange(false);
+									onCancel?.();
+								}}
+								disabled={loading}
+							>
+								{cancelLabel}
+							</Button>
+
+							<Button
+								onClick={async () => {
+									try {
+										await onConfirm();
+									} finally {
+										onOpenChange(false);
+									}
+								}}
+								disabled={loading}
+								className={
+									intent === 'danger'
+										? 'bg-red-600 hover:bg-red-700 text-white'
+										: ''
+								}
+							>
+								{loading ? 'Processing...' : confirmLabel}
+							</Button>
+						</div>
+					</Dialog.Content>
 				</div>
-			</div>
-		</div>
+			</Dialog.Portal>
+		</Dialog.Root>
 	);
 }
