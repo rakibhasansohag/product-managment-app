@@ -12,6 +12,8 @@ import toast from 'react-hot-toast';
 import Link from 'next/link';
 import debounce from 'lodash.debounce';
 import type { Product } from '@/types/product';
+import { Search, Plus, Filter, Package } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export default function ProductsClient() {
 	const [offset, setOffset] = useState<number>(0);
@@ -51,11 +53,11 @@ export default function ProductsClient() {
 	const handleDelete = async (id: string) => {
 		try {
 			await deleteProduct(id).unwrap();
-			toast.success('Deleted');
+			toast.success('Product deleted successfully');
 			refetch();
 			setConfirmOpen(false);
 		} catch (err) {
-			toast.error('Delete failed');
+			toast.error('Failed to delete product');
 		}
 	};
 
@@ -64,77 +66,126 @@ export default function ProductsClient() {
 	) as Product[];
 
 	return (
-		<div>
-			<div className='mb-4 flex items-center justify-between gap-4'>
-				<input
-					placeholder='Search products...'
-					onChange={(e) => debouncedSet(e.target.value)}
-					className='border px-3 py-2 rounded w-80'
-				/>
-				<Link
-					href='/products/new'
-					className='px-4 py-2 rounded bg-blue-600 text-white'
-				>
-					New Product
-				</Link>
-			</div>
-
-			{isLoading && <div>Loading...</div>}
-			{isError && <div>Error loading products</div>}
-
-			<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
-				{list.map((p) => (
-					<div key={p.id} className='relative'>
-						<ProductCard product={p} />
-						<div className='p-2 flex gap-2 mt-2'>
-							<Link
-								href={`/products/${p.slug ?? p.id}`}
-								className='text-sm text-blue-600'
-							>
-								View
-							</Link>
-							<Link
-								href={`/products/${p.slug ?? p.id}/edit`}
-								className='text-sm text-gray-700'
-							>
-								Edit
-							</Link>
-							<button
-								onClick={() => {
-									setSelectedId(p.id);
-									setConfirmOpen(true);
-								}}
-								className='text-sm text-red-600'
-							>
-								Delete
-							</button>
-						</div>
-					</div>
-				))}
-			</div>
-
-			<div className='mt-6 flex items-center justify-between'>
+		<div className='space-y-6'>
+			{/* Header Section */}
+			<div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
 				<div>
-					<button
-						disabled={offset === 0}
-						className='px-3 py-2 border rounded mr-2 disabled:opacity-50'
-						onClick={() => setOffset(Math.max(0, offset - limit))}
-					>
-						Prev
-					</button>
-					<button
-						className='px-3 py-2 border rounded'
-						onClick={() => setOffset(offset + limit)}
-					>
-						Next
-					</button>
+					<h1 className='text-2xl font-bold text-slate-800'>Products</h1>
+					<p className='text-slate-500 mt-1'>Manage your product inventory</p>
 				</div>
+
+				<Button asChild>
+					<Link href='/products/new'>
+						<Plus />
+						Add Product
+					</Link>
+				</Button>
 			</div>
+
+			{/* Filters and Search */}
+			<div className='flex flex-col sm:flex-row gap-3'>
+				<div className='flex-1 relative'>
+					<Search
+						className='absolute left-3 top-1/2 -translate-y-1/2 text-slate-400'
+						size={20}
+					/>
+					<input
+						placeholder='Search by name, description...'
+						onChange={(e) => debouncedSet(e.target.value)}
+						className='w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all'
+					/>
+				</div>
+				{/* TODO : Will add filter after re-desiging the whole things */}
+				<Button variant='outline'>
+					<Filter />
+					<span className='hidden sm:inline'>Filters</span>
+				</Button>
+			</div>
+
+			{/* Loading State */}
+			{isLoading && (
+				<div className='flex items-center justify-center py-12'>
+					<div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600'></div>
+				</div>
+			)}
+
+			{/* Error State */}
+			{isError && (
+				<div className='bg-red-50 border border-red-200 rounded-lg p-4 text-red-700'>
+					<p className='font-medium'>Error loading products</p>
+					<p className='text-sm mt-1'>Please try again later</p>
+					<Button onClick={() => refetch()} className='mt-2'>
+						Or refresh
+					</Button>
+				</div>
+			)}
+
+			{/* Products Grid */}
+			{!isLoading && !isError && (
+				<>
+					{list.length === 0 ? (
+						<div className='text-center py-12 bg-white rounded-lg border border-slate-200'>
+							<Package size={48} className='mx-auto text-slate-300 mb-4' />
+							<h3 className='text-lg font-medium text-slate-800'>
+								No products found
+							</h3>
+							<p className='text-slate-500 mt-1'>
+								Get started by creating your first product
+							</p>
+							<Button asChild className='mt-4'>
+								<Link href='/products/new'>
+									<Plus />
+									Add Product
+								</Link>
+							</Button>
+						</div>
+					) : (
+						<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+							{list.map((p) => (
+								<ProductCard
+									key={p.id}
+									product={p}
+									onDelete={() => {
+										setSelectedId(p.id);
+										setConfirmOpen(true);
+									}}
+								/>
+							))}
+						</div>
+					)}
+				</>
+			)}
+
+			{/* Pagination */}
+			{!isLoading && list.length > 0 && (
+				<div className='flex flex-col sm:flex-row items-center justify-between gap-4 pt-4'>
+					<div>
+						<p className='text-sm text-slate-600'>
+							Showing <span className='font-medium'>{offset + 1}</span> to{' '}
+							<span className='font-medium'>{offset + list.length}</span> of
+							products
+						</p>
+					</div>
+
+					<div className='flex gap-2'>
+						<Button
+							variant='outline'
+							disabled={offset === 0}
+							onClick={() => setOffset(Math.max(0, offset - limit))}
+						>
+							Previous
+						</Button>
+						<Button variant='outline' onClick={() => setOffset(offset + limit)}>
+							Next
+						</Button>
+					</div>
+				</div>
+			)}
 
 			<ConfirmDialog
 				open={confirmOpen}
-				title='Delete product?'
-				message='This will simulate deletion (mock api). Continue?'
+				title='Delete Product'
+				message='Are you sure you want to delete this product? This action cannot be undone.'
 				onCancel={() => setConfirmOpen(false)}
 				onConfirm={() => selectedId && handleDelete(selectedId)}
 			/>

@@ -1,33 +1,65 @@
 'use client';
 import Link from 'next/link';
 import type { Product } from '@/types/product';
+import { Edit, Trash2, Eye } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 
-export default function ProductCard({ product }: { product: Product }) {
-	console.log(product);
-
+export default function ProductCard({
+	product,
+	onDelete,
+}: {
+	product: Product;
+	onDelete: () => void;
+}) {
 	return (
-		<div className='bg-white shadow rounded overflow-hidden'>
-			<Image
-				width={500}
-				height={500}
-				src={product.images?.[0] ?? '/placeholder.png'}
-				alt={product.name}
-				className='w-full h-44 object-cover'
-			/>
-			<div className='p-4'>
-				<h3 className='font-semibold'>{product.name}</h3>
-				<p className='text-sm text-gray-500 mt-1 line-clamp-2'>
-					{product.description}
+		<div className='bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-200 group'>
+			{/* Image */}
+			<div className='relative h-48 overflow-hidden bg-slate-100'>
+				<Image
+					width={500}
+					height={500}
+					src={product.images?.[0] ?? '/placeholder.png'}
+					alt={product.name}
+					className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-300'
+				/>
+				<div className='absolute top-3 right-3'>
+					<span className='bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-semibold text-slate-800'>
+						৳ {product.price}
+					</span>
+				</div>
+			</div>
+
+			{/* Content */}
+			<div className='p-5'>
+				<h3 className='font-semibold text-lg text-slate-800 mb-2 line-clamp-1'>
+					{product.name}
+				</h3>
+				<p className='text-sm text-slate-500 line-clamp-2 mb-4 min-h-[2.5rem]'>
+					{product.description || 'No description available'}
 				</p>
-				<div className='mt-3 flex items-center justify-between'>
-					<span className='font-medium'>৳ {product.price}</span>
-					<Link
-						href={`/products/${product.slug ?? product.id}`}
-						className='text-sm text-blue-600'
+
+				{/* Actions */}
+				<div className='flex items-center gap-2'>
+					<Button asChild variant='secondary' size='sm' className='flex-1'>
+						<Link href={`/products/${product.slug ?? product.id}`}>
+							<Eye />
+							View
+						</Link>
+					</Button>
+					<Button asChild variant='outline' size='icon-sm'>
+						<Link href={`/products/${product.slug ?? product.id}/edit`}>
+							<Edit />
+						</Link>
+					</Button>
+					<Button
+						onClick={onDelete}
+						variant='outline'
+						size='icon-sm'
+						className='border-red-200 text-red-600 hover:bg-red-50'
 					>
-						Details
-					</Link>
+						<Trash2 />
+					</Button>
 				</div>
 			</div>
 		</div>
