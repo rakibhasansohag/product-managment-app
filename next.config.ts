@@ -70,6 +70,18 @@ const nextConfig: NextConfig = {
 				port: '',
 				pathname: '/**',
 			},
+			{
+				protocol: 'https',
+				hostname: 'picsum.photos',
+				port: '',
+				pathname: '/**',
+			},
+			{
+				protocol: 'https',
+				hostname: 't3.ftcdn.net',
+				port: '',
+				pathname: '/**',
+			},
 		],
 	},
 };
