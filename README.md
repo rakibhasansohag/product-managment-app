@@ -82,31 +82,67 @@ NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=YOUR_CLOUDINARY_UPLOAD_PRESET
 
 The application follows a standard Next.js App Router structure, organizing core logic with Redux Toolkit and utility functions in dedicated directories.
 
-
-src/
-├─ app/
-│  ├─ layout.tsx                # root layout (fonts, global provider)
-│  ├─ page.tsx                  # root page (redirect to /products)
-│  ├─ error.tsx                 # optional global error boundary
-│  └─ globals.css
-│  └─ (dashboard)/
-│     ├─ layout.tsx             # dashboard layout (Sidebar + Topbar + main)
-│     └─ products/
-│        ├─ page.tsx
-│        ├─ new/page.tsx
-│        └─ [id]/edit/page.tsx
-├─ components/                  # UI & feature components
-├─ redux/
-│  ├─ store.ts                  # redux store config
-│  ├─ hooks.ts                  # typed hooks (useAppDispatch/useAppSelector)
-│  └─ features/
-│     ├─ apiSlice.ts            # RTK Query base api (prepareHeaders)
-│     ├─ productApi.ts          # product endpoints (getProducts, update, etc.)
-│     └─ authSlice.ts           # simple auth state (token)
-├─ types/
-│  └─ product.ts                # Product & Category types
-├─ lib/
-│  └─ cloudinary.ts             # optional upload helper
-
+ src 
+    ├──  app 
+        ├──  (auth) 
+            └──  login 
+                └──  page.tsx 
+        ├──  (dashboard) 
+            ├──  products 
+                ├──  [id] 
+                    ├──  edit 
+                        └──  page.tsx 
+                    └──  page.tsx 
+                ├──  new 
+                    └──  page.tsx 
+                ├──  loading.tsx 
+                └──  page.tsx 
+            ├──  layout.tsx 
+            └──  loading.tsx 
+        ├──  error.tsx 
+        ├──  favicon.ico 
+        ├──  globals.css 
+        ├──  layout.tsx 
+        ├──  loading.tsx 
+        ├──  not-found.tsx 
+        └──  page.tsx 
+    ├──  components 
+        ├──  layout 
+            ├──  sidebar.tsx 
+            └──  topbar.tsx 
+        ├──  product 
+            ├──  productCard.tsx 
+            ├──  productForm.tsx 
+            └──  productsClient.tsx 
+        ├──  shared 
+            └──  confirmDialog.tsx 
+        ├──  ui 
+            ├──  badge.tsx 
+            ├──  button.tsx 
+            ├──  card.tsx 
+            ├──  dialog.tsx 
+            ├──  dropdown-menu.tsx 
+            ├──  form.tsx 
+            ├──  input.tsx 
+            ├──  label.tsx 
+            ├──  select.tsx 
+            ├──  skeleton.tsx 
+            ├──  table.tsx 
+            └──  textarea.tsx 
+        ├──  clientProvider.tsx 
+        └──  globalLoading.tsx 
+    ├──  lib 
+        ├──  cloudinary.ts 
+        └──  utils.ts 
+    ├──  redux 
+        ├──  features 
+            ├──  apiSlice.ts 
+            ├──  authSlice.ts 
+            └──  productApi.ts 
+        ├──  hooks.ts 
+        └──  store.ts 
+    ├──  types 
+        └──  product.ts 
+    └──  .middleware.ts 
 
 
