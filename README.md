@@ -82,7 +82,7 @@ NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=YOUR_CLOUDINARY_UPLOAD_PRESET
 
 The application follows a standard Next.js App Router structure, organizing core logic with Redux Toolkit and utility functions in dedicated directories.
 
-\`\`\`
+
 src/
 ├─ app/
 │  ├─ layout.tsx                # root layout (fonts, global provider)
@@ -108,5 +108,5 @@ src/
 ├─ lib/
 │  └─ cloudinary.ts             # optional upload helper
 
-\`\`\`
+
 
