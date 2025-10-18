@@ -80,7 +80,7 @@ NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=YOUR_CLOUDINARY_UPLOAD_PRESET
 
 ##  Project Structure
 
-src/
+src
 ├── app/
 │ ├── (auth)/
 │ │ └── login/
