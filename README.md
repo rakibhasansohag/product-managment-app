@@ -67,7 +67,7 @@ npm run start
 
 Create a file named **\`.env.local\`** in the project's root directory and populate it with your configuration:
 
-\`\`\`ini
+\`\`\`
 # API URL for your backend services
 NEXT_PUBLIC_API_URL=https://api.bitechx.com
 
@@ -85,28 +85,28 @@ The application follows a standard Next.js App Router structure, organizing core
 \`\`\`
 src/
 ├─ app/
-│  ├─ layout.tsx                  # Root layout (fonts, providers)
-│  ├─ page.tsx                    # Redirect to /products
-│  ├─ error.tsx                   # Optional global error boundary
+│  ├─ layout.tsx                # root layout (fonts, global provider)
+│  ├─ page.tsx                  # root page (redirect to /products)
+│  ├─ error.tsx                 # optional global error boundary
+│  └─ globals.css
 │  └─ (dashboard)/
-│     ├─ layout.tsx               # Dashboard layout (Sidebar + Topbar + Main)
+│     ├─ layout.tsx             # dashboard layout (Sidebar + Topbar + main)
 │     └─ products/
-│        ├─ page.tsx              # Product list (table/grid view)
-│        ├─ new/page.tsx          # Add new product form
-│        └─ [id]/edit/page.tsx    # Edit existing product
-├─ components/                    # Reusable UI components (Form, Modal, Card, etc.)
+│        ├─ page.tsx
+│        ├─ new/page.tsx
+│        └─ [id]/edit/page.tsx
+├─ components/                  # UI & feature components
 ├─ redux/
-│  ├─ store.ts                    # Redux store setup
-│  ├─ hooks.ts                    # Typed hooks (useAppDispatch, useAppSelector)
+│  ├─ store.ts                  # redux store config
+│  ├─ hooks.ts                  # typed hooks (useAppDispatch/useAppSelector)
 │  └─ features/
-│     ├─ apiSlice.ts              # RTK Query base API configuration
-│     ├─ productApi.ts            # Product endpoints (CRUD)
-│     └─ authSlice.ts             # Auth state (token handling)
+│     ├─ apiSlice.ts            # RTK Query base api (prepareHeaders)
+│     ├─ productApi.ts          # product endpoints (getProducts, update, etc.)
+│     └─ authSlice.ts           # simple auth state (token)
 ├─ types/
-│  └─ product.ts                  # TypeScript types for Products & Categories
+│  └─ product.ts                # Product & Category types
 ├─ lib/
-│  └─ cloudinary.ts               # Cloudinary helper functions (upload/delete)
-└─ utils/
-   └─ helpers.ts                  # Optional utility functions (formatting, validation, etc.)
+│  └─ cloudinary.ts             # optional upload helper
+
 \`\`\`
 
