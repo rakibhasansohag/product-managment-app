@@ -80,8 +80,6 @@ NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=YOUR_CLOUDINARY_UPLOAD_PRESET
 
 ##  Project Structure
 
-The application follows a standard Next.js App Router structure, organizing core logic with Redux Toolkit and utility functions in dedicated directories.
-
 src/
 ├── app/
 │ ├── (auth)/
