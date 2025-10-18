@@ -27,7 +27,9 @@ export default function Topbar() {
 						</div>
 						<div className='hidden md:block'>
 							<p className='text-sm font-medium text-foreground'>Admin User</p>
-							<p className='text-xs text-muted-foreground'>admin@example.com</p>
+							<p className='text-xs text-muted-foreground'>
+								rakibhasansohag133@gmail.com
+							</p>
 						</div>
 					</div>
 				</div>
