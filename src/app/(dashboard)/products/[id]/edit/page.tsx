@@ -17,7 +17,7 @@ import { productApi } from '@/redux/features/productApi';
 import { useAppDispatch } from '@/redux/hooks';
 
 // TODO  : Lets' remove the any type from those pages and types
-
+// TODO : also have to added the colors palate to across the website
 export default function EditProductPage({
 	params,
 }: {

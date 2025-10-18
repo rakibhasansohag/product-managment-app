@@ -3,29 +3,20 @@ import Link from 'next/link';
 import type { Product } from '@/types/product';
 import { Edit, Trash2, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import Image from 'next/image';
 
 export default function ProductCard({
 	product,
 	onDelete,
+	viewOnly = false,
 }: {
 	product: Product;
-	onDelete: () => void;
+	onDelete?: () => void;
+	viewOnly?: boolean;
 }) {
 	return (
 		<div className='bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-200 group'>
 			{/* Image */}
 			<div className='relative h-48 overflow-hidden bg-slate-100'>
-				{/* ERROR : Remoed the next js image cuz  of the lot of domain coming in the server and also there is this image doamin that code buggeed 
-				
-				{
-				protocol: 'https',
-				hostname: 'letsenhance.io',
-				port: '',
-				pathname: '/**',
-			},
-				*/}
-
 				<img
 					src={product.images?.[0] ?? '/placeholder.png'}
 					alt={product.name}
@@ -48,27 +39,40 @@ export default function ProductCard({
 				</p>
 
 				{/* Actions */}
-				<div className='flex items-center gap-2'>
-					<Button asChild variant='secondary' size='sm' className='flex-1'>
+				{viewOnly ? (
+					// View Only Mode - Just the View button
+					<Button asChild variant='secondary' size='sm' className='w-full'>
 						<Link href={`/products/${product.slug ?? product.id}`}>
 							<Eye />
-							View
+							View Details
 						</Link>
 					</Button>
-					<Button asChild variant='outline' size='icon-sm'>
-						<Link href={`/products/${product.slug ?? product.id}/edit`}>
-							<Edit />
-						</Link>
-					</Button>
-					<Button
-						onClick={onDelete}
-						variant='outline'
-						size='icon-sm'
-						className='border-red-200 text-red-600 hover:bg-red-50'
-					>
-						<Trash2 />
-					</Button>
-				</div>
+				) : (
+					// Full Mode - All actions
+					<div className='flex items-center gap-2'>
+						<Button asChild variant='secondary' size='sm' className='flex-1'>
+							<Link href={`/products/${product.slug ?? product.id}`}>
+								<Eye />
+								View
+							</Link>
+						</Button>
+						<Button asChild variant='outline' size='icon-sm'>
+							<Link href={`/products/${product.slug ?? product.id}/edit`}>
+								<Edit />
+							</Link>
+						</Button>
+						{onDelete && (
+							<Button
+								onClick={onDelete}
+								variant='outline'
+								size='icon-sm'
+								className='border-red-200 text-red-600 hover:bg-red-50'
+							>
+								<Trash2 />
+							</Button>
+						)}
+					</div>
+				)}
 			</div>
 		</div>
 	);
