@@ -79,7 +79,7 @@ NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=YOUR_CLOUDINARY_UPLOAD_PRESET
 ---
 
 ##  Project Structure
-
+```
 src
 ├── app/
 │ ├── (auth)/
@@ -131,4 +131,4 @@ src
 ├── types/
 │ └── product.ts
 └── middleware.ts
-
+```
