@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
+
 import React, { useRef, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
@@ -38,13 +38,21 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
+export type ProductPayload = {
+	name: string;
+	description: string;
+	price: number;
+	images?: string[];
+	categoryId?: string;
+};
+
 export default function ProductForm({
 	defaultValues,
 	onSubmit,
 	submitLabel = 'Create Product',
 }: {
 	defaultValues?: Partial<FormValues & { images?: string[] }>;
-	onSubmit: (payload: any) => Promise<void>;
+	onSubmit: (payload: ProductPayload) => Promise<void>;
 	submitLabel?: string;
 }) {
 	const { data: categories, isLoading: categoriesLoading } =

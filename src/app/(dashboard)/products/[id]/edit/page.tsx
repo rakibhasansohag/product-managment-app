@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
-import React, { useState, useCallback } from 'react';
-import ProductForm from '@/components/product/productForm';
+
+import React, { useCallback, useState } from 'react';
+import ProductForm, { ProductPayload } from '@/components/product/productForm';
 import {
 	useGetProductByIdQuery,
 	useUpdateProductMutation,
@@ -15,8 +15,8 @@ import GlobalLoading from '@/components/globalLoading';
 import ConfirmDialog from '@/components/shared/confirmDialog';
 import { productApi } from '@/redux/features/productApi';
 import { useAppDispatch } from '@/redux/hooks';
+import type { Product } from '@/types/product';
 
-// TODO  : Lets' remove the any type from those pages and types
 export default function EditProductPage({
 	params,
 }: {
@@ -30,25 +30,23 @@ export default function EditProductPage({
 	const dispatch = useAppDispatch();
 
 	// confirmation flow state
-	const [confirmOpen, setConfirmOpen] = useState(false);
-	const [confirmLoading, setConfirmLoading] = useState(false);
-	const [pendingPayload, setPendingPayload] = useState<Record<
-		string,
-		any
-	> | null>(null);
+	const [confirmOpen, setConfirmOpen] = useState<boolean>(false);
+	const [confirmLoading, setConfirmLoading] = useState<boolean>(false);
+	const [pendingPayload, setPendingPayload] = useState<ProductPayload | null>(
+		null,
+	);
 
 	// resolver for the promise returned to ProductForm
 	const [submitResolver, setSubmitResolver] = useState<
 		((value?: void | PromiseLike<void>) => void) | null
 	>(null);
 	const [submitRejecter, setSubmitRejecter] = useState<
-		((reason?: any) => void) | null
+		((reason?: unknown) => void) | null
 	>(null);
 
 	const handleFormSubmit = useCallback(
-		(payload: Record<string, any>) =>
+		(payload: ProductPayload) =>
 			new Promise<void>((resolve, reject) => {
-				// save payload then open confirm dialog
 				setPendingPayload(payload);
 				setSubmitResolver(() => resolve);
 				setSubmitRejecter(() => reject);
@@ -66,25 +64,25 @@ export default function EditProductPage({
 
 		setConfirmLoading(true);
 		try {
-			const updated = await update({
+			const updated: Product = await update({
 				id: product.id,
 				...pendingPayload,
 			}).unwrap();
 
-			// success toast
 			toast.success('Product updated successfully!');
 
+			// update caches safely
 			try {
 				dispatch(
 					productApi.util.updateQueryData(
 						'getProductById',
 						updated.id,
-						(draft) => {
+						(draft: Product) => {
 							Object.assign(draft, updated);
 						},
 					),
 				);
-			} catch (e) {
+			} catch {
 				// ignore
 			}
 
@@ -94,12 +92,12 @@ export default function EditProductPage({
 						productApi.util.updateQueryData(
 							'getProductBySlug',
 							updated.slug,
-							(draft) => {
+							(draft: Product) => {
 								Object.assign(draft, updated);
 							},
 						),
 					);
-				} catch (e) {
+				} catch {
 					// ignore
 				}
 			}
@@ -108,10 +106,8 @@ export default function EditProductPage({
 				productApi.util.invalidateTags([{ type: 'Product', id: 'LIST' }]),
 			);
 
-			// resolve the pending form submit
 			submitResolver?.();
 
-			// close dialog and navigate to the new slug
 			setConfirmOpen(false);
 			const destination = updated.slug
 				? `/products/${updated.slug}`
@@ -130,27 +126,22 @@ export default function EditProductPage({
 	}, [
 		pendingPayload,
 		product,
-		submitResolver,
 		update,
 		dispatch,
 		router,
+		submitResolver,
 		submitRejecter,
 	]);
 
 	const cancelConfirm = useCallback(() => {
 		setConfirmOpen(false);
-
 		submitRejecter?.(new Error('User cancelled'));
-
-		// cleanup
 		setPendingPayload(null);
 		setSubmitResolver(null);
 		setSubmitRejecter(null);
 	}, [submitRejecter]);
 
-	if (isLoading) {
-		return <GlobalLoading />;
-	}
+	if (isLoading) return <GlobalLoading />;
 
 	if (isError || !product) {
 		return (
@@ -167,8 +158,7 @@ export default function EditProductPage({
 					</p>
 					<Button asChild>
 						<Link href='/products'>
-							<ArrowLeft />
-							Back to Products
+							<ArrowLeft /> Back to Products
 						</Link>
 					</Button>
 				</div>
@@ -178,8 +168,7 @@ export default function EditProductPage({
 
 	return (
 		<div className='space-y-6'>
-			{/* Header */}
-			<div className='flex  gap-4'>
+			<div className='flex gap-4 items-center'>
 				<Button variant='default' size='icon' asChild>
 					<Link href={`/products/${product.slug ?? product.id}`}>
 						<ArrowLeft />
@@ -188,14 +177,13 @@ export default function EditProductPage({
 
 				<div>
 					<h1 className='text-3xl font-bold text-slate-800'>Edit Product</h1>
-					<p className='text-slate-500 mt-1'>
+					<p className='text-foreground mt-1'>
 						Update details for{' '}
 						<span className='font-medium'>{product.name}</span>
 					</p>
 				</div>
 			</div>
 
-			{/* Form */}
 			<div className='max-w-7xl'>
 				<ProductForm
 					defaultValues={{
@@ -205,17 +193,14 @@ export default function EditProductPage({
 						images: product.images ?? undefined,
 						categoryId: product.category?.id ?? '',
 					}}
-					// instead of immediately updating, we open confirmation first
 					onSubmit={handleFormSubmit}
 					submitLabel='Update Product'
 				/>
 			</div>
 
-			{/* Confirm dialog shown when form submits */}
 			<ConfirmDialog
 				open={confirmOpen}
 				onOpenChange={(v) => {
-					// if user closes via overlay/esc key, treat as cancel
 					if (!v) cancelConfirm();
 					setConfirmOpen(v);
 				}}
