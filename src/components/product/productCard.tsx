@@ -14,16 +14,16 @@ export default function ProductCard({
 	viewOnly?: boolean;
 }) {
 	return (
-		<div className='bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-200 group'>
+		<div className='bg-card rounded-xl shadow-sm border border-border overflow-hidden hover:shadow-md transition-all duration-200 group'>
 			{/* Image */}
-			<div className='relative h-48 overflow-hidden bg-slate-100'>
+			<div className='relative h-48 overflow-hidden bg-muted'>
 				<img
 					src={product.images?.[0] ?? '/placeholder.png'}
 					alt={product.name}
 					className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-300'
 				/>
 				<div className='absolute top-3 right-3'>
-					<span className='bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-semibold text-slate-800'>
+					<span className='bg-card/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-semibold text-foreground border border-border'>
 						৳ {product.price}
 					</span>
 				</div>
@@ -31,16 +31,15 @@ export default function ProductCard({
 
 			{/* Content */}
 			<div className='p-5'>
-				<h3 className='font-semibold text-lg text-slate-800 mb-2 line-clamp-1'>
+				<h3 className='font-semibold text-lg text-foreground mb-2 line-clamp-1'>
 					{product.name}
 				</h3>
-				<p className='text-sm text-slate-500 line-clamp-2 mb-4 min-h-[2.5rem]'>
+				<p className='text-sm text-muted-foreground line-clamp-2 mb-4 min-h-[2.5rem]'>
 					{product.description || 'No description available'}
 				</p>
 
 				{/* Actions */}
 				{viewOnly ? (
-					// View Only Mode - Just the View button
 					<Button asChild variant='secondary' size='sm' className='w-full'>
 						<Link href={`/products/${product.slug ?? product.id}`}>
 							<Eye />
@@ -48,9 +47,8 @@ export default function ProductCard({
 						</Link>
 					</Button>
 				) : (
-					// Full Mode - All actions
 					<div className='flex items-center gap-2'>
-						<Button asChild variant='secondary' size='sm' className='flex-1'>
+						<Button asChild variant='default' size='sm' className='flex-1'>
 							<Link href={`/products/${product.slug ?? product.id}`}>
 								<Eye />
 								View
@@ -62,12 +60,7 @@ export default function ProductCard({
 							</Link>
 						</Button>
 						{onDelete && (
-							<Button
-								onClick={onDelete}
-								variant='outline'
-								size='icon-sm'
-								className='border-red-200 text-red-600 hover:bg-red-50'
-							>
+							<Button onClick={onDelete} variant='destructive' size='icon-sm'>
 								<Trash2 />
 							</Button>
 						)}

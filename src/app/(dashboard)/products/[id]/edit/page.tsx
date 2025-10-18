@@ -17,7 +17,6 @@ import { productApi } from '@/redux/features/productApi';
 import { useAppDispatch } from '@/redux/hooks';
 
 // TODO  : Lets' remove the any type from those pages and types
-// TODO : also have to added the colors palate to across the website
 export default function EditProductPage({
 	params,
 }: {
@@ -160,10 +159,10 @@ export default function EditProductPage({
 					<div className='w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4'>
 						<TriangleAlert className='w-8 h-8 text-red-600' />
 					</div>
-					<h2 className='text-xl font-semibold text-slate-800 mb-2'>
+					<h2 className='text-xl font-semibold text-foreground mb-2'>
 						Product Not Found
 					</h2>
-					<p className='text-slate-600 mb-4'>
+					<p className='text-foreground mb-4'>
 						The product you&apos;re looking for doesn&apos;t exist.
 					</p>
 					<Button asChild>
@@ -180,8 +179,8 @@ export default function EditProductPage({
 	return (
 		<div className='space-y-6'>
 			{/* Header */}
-			<div className='flex items-center gap-4'>
-				<Button variant='ghost' size='icon' asChild>
+			<div className='flex  gap-4'>
+				<Button variant='default' size='icon' asChild>
 					<Link href={`/products/${product.slug ?? product.id}`}>
 						<ArrowLeft />
 					</Link>

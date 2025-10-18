@@ -55,7 +55,6 @@ export default function ProductsClient() {
 			await deleteProduct(id).unwrap();
 			toast.success('Product deleted successfully');
 			refetch();
-
 			setConfirmOpen(false);
 			setSelectedId(null);
 		} catch (err) {
@@ -72,8 +71,10 @@ export default function ProductsClient() {
 			{/* Header Section */}
 			<div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
 				<div>
-					<h1 className='text-2xl font-bold text-slate-800'>Products</h1>
-					<p className='text-slate-500 mt-1'>Manage your product inventory</p>
+					<h1 className='text-2xl font-bold text-foreground'>Products</h1>
+					<p className='text-muted-foreground mt-1'>
+						Manage your product inventory
+					</p>
 				</div>
 
 				<Button asChild>
@@ -88,16 +89,15 @@ export default function ProductsClient() {
 			<div className='flex flex-col sm:flex-row gap-3'>
 				<div className='flex-1 relative'>
 					<Search
-						className='absolute left-3 top-1/2 -translate-y-1/2 text-slate-400'
+						className='absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground'
 						size={20}
 					/>
 					<input
 						placeholder='Search by name, description...'
 						onChange={(e) => debouncedSet(e.target.value)}
-						className='w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all'
+						className='w-full pl-10 pr-4 py-2.5 border border-border bg-card text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all placeholder:text-muted-foreground'
 					/>
 				</div>
-				{/* TODO : Will add filter after re-desiging the whole things */}
 				<Button variant='outline'>
 					<Filter />
 					<span className='hidden sm:inline'>Filters</span>
@@ -107,17 +107,17 @@ export default function ProductsClient() {
 			{/* Loading State */}
 			{isLoading && (
 				<div className='flex items-center justify-center py-12'>
-					<div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600'></div>
+					<div className='animate-spin rounded-full h-12 w-12 border-b-2 border-primary'></div>
 				</div>
 			)}
 
 			{/* Error State */}
 			{isError && (
-				<div className='bg-red-50 border border-red-200 rounded-lg p-4 text-red-700'>
+				<div className='bg-destructive/10 border border-destructive/20 rounded-lg p-4 text-destructive'>
 					<p className='font-medium'>Error loading products</p>
 					<p className='text-sm mt-1'>Please try again later</p>
-					<Button onClick={() => refetch()} className='mt-2'>
-						Or refresh
+					<Button onClick={() => refetch()} className='mt-2' variant='outline'>
+						Refresh
 					</Button>
 				</div>
 			)}
@@ -126,12 +126,15 @@ export default function ProductsClient() {
 			{!isLoading && !isError && (
 				<>
 					{list.length === 0 ? (
-						<div className='text-center py-12 bg-white rounded-lg border border-slate-200'>
-							<Package size={48} className='mx-auto text-slate-300 mb-4' />
-							<h3 className='text-lg font-medium text-slate-800'>
+						<div className='text-center py-12 bg-card rounded-lg border border-border'>
+							<Package
+								size={48}
+								className='mx-auto text-muted-foreground mb-4'
+							/>
+							<h3 className='text-lg font-medium text-foreground'>
 								No products found
 							</h3>
-							<p className='text-slate-500 mt-1'>
+							<p className='text-muted-foreground mt-1'>
 								Get started by creating your first product
 							</p>
 							<Button asChild className='mt-4'>
@@ -162,10 +165,14 @@ export default function ProductsClient() {
 			{!isLoading && list.length > 0 && (
 				<div className='flex flex-col sm:flex-row items-center justify-between gap-4 pt-4'>
 					<div>
-						<p className='text-sm text-slate-600'>
-							Showing <span className='font-medium'>{offset + 1}</span> to{' '}
-							<span className='font-medium'>{offset + list.length}</span> of
-							products
+						<p className='text-sm text-muted-foreground'>
+							Showing{' '}
+							<span className='font-medium text-foreground'>{offset + 1}</span>{' '}
+							to{' '}
+							<span className='font-medium text-foreground'>
+								{offset + list.length}
+							</span>{' '}
+							of products
 						</p>
 					</div>
 

@@ -28,7 +28,6 @@ export default function LoginPage() {
 		register,
 		handleSubmit,
 		formState: { errors },
-
 		setValue,
 	} = useForm<FormData>({
 		resolver: zodResolver(schema),
@@ -56,15 +55,12 @@ export default function LoginPage() {
 			const json = await res.json();
 
 			if (json.token) {
-				// Set cookie with token
 				document.cookie = `token=${json.token}; path=/; max-age=${
 					60 * 60 * 24 * 7
 				}; samesite=lax`;
 
-				// Update Redux store
 				dispatch(setToken(json.token));
 
-				// Get redirect URL or default to products
 				const from = searchParams.get('from') || '/products';
 
 				toast.success('Welcome back!');
@@ -83,43 +79,43 @@ export default function LoginPage() {
 
 	const handleEmailClick = () => {
 		const demoEmail = 'rakibhasansohag133@gmail.com';
-
 		setValue('email', demoEmail, { shouldValidate: true, shouldDirty: true });
-		toast.success('Demo email filled! Please login.');
+		toast.success('Demo email filled! Click Sign In to continue.');
 	};
 
 	return (
-		<div className='h-screen w-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-slate-50 p-4 overflow-hidden'>
+		<div className='h-screen w-screen flex items-center justify-center bg-gradient-to-br from-background via-primary/5 to-secondary/10 p-4 overflow-hidden'>
+			{/* Background decoration */}
 			<div className='absolute inset-0 overflow-hidden pointer-events-none'>
-				<div className='absolute -top-40 -right-40 w-80 h-80 bg-blue-400/20 rounded-full blur-3xl'></div>
-				<div className='absolute -bottom-40 -left-40 w-80 h-80 bg-purple-400/20 rounded-full blur-3xl'></div>
+				<div className='absolute -top-40 -right-40 w-80 h-80 bg-primary/10 rounded-full blur-3xl'></div>
+				<div className='absolute -bottom-40 -left-40 w-80 h-80 bg-secondary/10 rounded-full blur-3xl'></div>
 			</div>
 
 			<div className='w-full max-w-md relative z-10'>
 				{/* Logo and Title */}
 				<div className='text-center mb-8'>
-					<div className='inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl shadow-lg mb-4'>
-						<Package className='text-white' size={32} />
+					<div className='inline-flex items-center justify-center w-16 h-16 bg-primary rounded-2xl shadow-lg mb-4'>
+						<Package className='text-primary-foreground' size={32} />
 					</div>
-					<h1 className='text-3xl font-bold text-slate-800 mb-2'>
+					<h1 className='text-3xl font-bold text-foreground mb-2'>
 						Welcome Back
 					</h1>
-					<p className='text-slate-600'>
+					<p className='text-muted-foreground'>
 						Sign in to access your product dashboard
 					</p>
 				</div>
 
 				{/* Login Form Card */}
-				<div className='bg-white rounded-2xl shadow-xl border border-slate-200 p-8'>
+				<div className='bg-card rounded-2xl shadow-xl border border-border p-8'>
 					<form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
 						{/* Email Field */}
 						<div className='space-y-2'>
-							<Label htmlFor='email' className='text-slate-700'>
+							<Label htmlFor='email' className='text-foreground'>
 								Email Address
 							</Label>
 							<div className='relative'>
 								<Mail
-									className='absolute left-3 top-1/2 -translate-y-1/2 text-slate-400'
+									className='absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground'
 									size={18}
 								/>
 								<Input
@@ -133,7 +129,7 @@ export default function LoginPage() {
 								/>
 							</div>
 							{errors.email && (
-								<div className='flex items-center gap-1.5 text-red-600 text-sm'>
+								<div className='flex items-center gap-1.5 text-destructive text-sm'>
 									<AlertCircle size={14} />
 									<span>{errors.email.message}</span>
 								</div>
@@ -144,7 +140,7 @@ export default function LoginPage() {
 						<Button type='submit' className='w-full h-11' disabled={isLoading}>
 							{isLoading ? (
 								<>
-									<div className='w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2'></div>
+									<div className='w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin mr-2'></div>
 									Signing in...
 								</>
 							) : (
@@ -154,17 +150,17 @@ export default function LoginPage() {
 					</form>
 
 					{/* Demo Credentials Info */}
-					<div className='mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200'>
-						<p className='text-sm text-blue-800 font-medium mb-1'>
-							Demo Authentication :{' '}
+					<div className='mt-6 p-4 bg-primary/5 rounded-lg border border-primary/20'>
+						<p className='text-sm text-foreground font-medium mb-1'>
+							Demo Authentication:{' '}
 							<span
 								onClick={handleEmailClick}
-								className='font-bold cursor-pointer underline text-blue-900 hover:text-blue-700 transition duration-150'
+								className='font-bold cursor-pointer underline text-primary hover:text-primary/80 transition duration-150'
 							>
 								rakibhasansohag133@gmail.com
 							</span>
 						</p>
-						<p className='text-xs text-blue-600'>
+						<p className='text-xs text-muted-foreground'>
 							Enter any valid email format to receive an authentication token
 						</p>
 					</div>
@@ -172,7 +168,9 @@ export default function LoginPage() {
 
 				{/* Footer */}
 				<div className='text-center mt-6'>
-					<p className='text-sm text-slate-500'>Powered by BitechX Mock API</p>
+					<p className='text-sm text-muted-foreground'>
+						Powered by BitechX Mock API
+					</p>
 				</div>
 			</div>
 		</div>

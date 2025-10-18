@@ -251,10 +251,10 @@ export default function ProductForm({
 						{!preview ? (
 							<div
 								onClick={() => fileRef.current?.click()}
-								className='border-2 border-dashed border-slate-300 rounded-lg p-8 text-center hover:border-blue-500 transition-colors cursor-pointer group'
+								className='border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer group'
 							>
 								<div className='flex flex-col items-center gap-3'>
-									<div className='w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-blue-50 transition-colors'>
+									<div className='w-16 h-16 rounded-full bg-muted flex items-center justify-center group-hover:bg-primary/10 transition-colors'>
 										{uploading ? (
 											<Loader2
 												className='text-blue-600 animate-spin'
@@ -262,16 +262,16 @@ export default function ProductForm({
 											/>
 										) : (
 											<Upload
-												className='text-slate-400 group-hover:text-blue-600'
+												className='text-muted-foreground group-hover:text-primary'
 												size={32}
 											/>
 										)}
 									</div>
 									<div>
-										<p className='font-medium text-slate-700'>
+										<p className='font-medium text-foreground'>
 											{uploading ? 'Uploading...' : 'Click to upload image'}
 										</p>
-										<p className='text-sm text-slate-500 mt-1'>
+										<p className='text-sm text-foreground mt-1'>
 											PNG, JPG or WEBP (Max 5MB)
 										</p>
 									</div>
@@ -286,7 +286,7 @@ export default function ProductForm({
 								/>
 							</div>
 						) : (
-							<div className='relative rounded-lg overflow-hidden border border-slate-200'>
+							<div className='relative rounded-lg overflow-hidden border border-border'>
 								{/* ERROR : Remoed the next js image cuz  of the lot of domain coming in the server and also there is this image doamin that code buggeed 
 				
 				{
@@ -303,14 +303,15 @@ export default function ProductForm({
 									className='w-full h-64 object-cover'
 									alt='Product preview'
 								/>
-								<button
+								<Button
 									type='button'
 									onClick={removeImage}
 									disabled={isSubmitting}
-									className='absolute top-3 right-3 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors shadow-lg disabled:opacity-50 cursor-pointer'
+									className='absolute top-3 right-3 p-2'
+									variant={'destructive'}
 								>
 									<X size={18} />
-								</button>
+								</Button>
 							</div>
 						)}
 
