@@ -5,6 +5,7 @@ import {
 	useGetProductsQuery,
 	useDeleteProductMutation,
 	useSearchProductsQuery,
+	useGetCategoriesQuery,
 } from '@/redux/features/productApi';
 import ProductCard from '@/components/product/productCard';
 import ConfirmDialog from '@/components/shared/confirmDialog';
@@ -12,32 +13,59 @@ import toast from 'react-hot-toast';
 import Link from 'next/link';
 import debounce from 'lodash.debounce';
 import type { Product } from '@/types/product';
-import { Search, Plus, Filter, Package } from 'lucide-react';
+import { Search, Plus, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+	Select,
+	SelectTrigger,
+	SelectContent,
+	SelectItem,
+	SelectValue,
+} from '@/components/ui/select';
 
 export default function ProductsClient() {
 	const [offset, setOffset] = useState<number>(0);
 	const limit = 9;
+
+	// search state
 	const [searchText, setSearchText] = useState<string>('');
 	const [queryEnabled, setQueryEnabled] = useState<boolean>(false);
 
+	// category
+	const [categoryId, setCategoryId] = useState<string>('');
+
+	// confirm delete
+	const [confirmOpen, setConfirmOpen] = useState(false);
+	const [selectedId, setSelectedId] = useState<string | null>(null);
+
+	// fetch categories
+	const { data: categories, isLoading: categoriesLoading } =
+		useGetCategoriesQuery({ offset: 0, limit: 9 });
+
+	// choose whether we should use search endpoint
+	useEffect(() => {
+		setQueryEnabled(Boolean(searchText && searchText.trim()));
+	}, [searchText]);
+
+	// products: skip when searching or filtering
 	const {
 		data: products,
 		isLoading,
 		isError,
 		refetch,
-	} = useGetProductsQuery({ offset, limit });
+	} = useGetProductsQuery(
+		{ offset, limit, ...(categoryId ? { categoryId } : {}) },
+		{ skip: queryEnabled }, // skip list when search is enabled
+	);
+
+	// search results hook
 	const { data: searchResults } = useSearchProductsQuery(searchText, {
 		skip: !queryEnabled,
 	});
+
 	const [deleteProduct] = useDeleteProductMutation();
-	const [confirmOpen, setConfirmOpen] = useState(false);
-	const [selectedId, setSelectedId] = useState<string | null>(null);
 
-	useEffect(() => {
-		setQueryEnabled(Boolean(searchText && searchText.trim()));
-	}, [searchText]);
-
+	// debounced setter for search input value
 	const debouncedSet = useMemo(
 		() =>
 			debounce((v: string) => {
@@ -49,6 +77,13 @@ export default function ProductsClient() {
 	useEffect(() => {
 		return () => debouncedSet.cancel();
 	}, [debouncedSet]);
+
+	// when category changes, reset pagination and  clear search
+	const handleCategoryChange = (val: string) => {
+		setCategoryId(val); // '' means all
+		setOffset(0);
+		// we intentionally do NOT clear searchText here because search has priority
+	};
 
 	const handleDelete = async (id: string) => {
 		try {
@@ -62,13 +97,20 @@ export default function ProductsClient() {
 		}
 	};
 
+	// which list to show
 	const list: Product[] = (
 		queryEnabled ? searchResults ?? [] : products ?? []
 	) as Product[];
 
+	const apiCategoryId = categoryId === 'all' ? undefined : categoryId;
+	useGetProductsQuery(
+		{ offset, limit, ...(apiCategoryId ? { categoryId: apiCategoryId } : {}) },
+		{ skip: queryEnabled },
+	);
+
 	return (
 		<div className='space-y-6'>
-			{/* Header Section */}
+			{/* Header */}
 			<div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
 				<div>
 					<h1 className='text-2xl font-bold text-foreground'>Products</h1>
@@ -85,33 +127,47 @@ export default function ProductsClient() {
 				</Button>
 			</div>
 
-			{/* Filters and Search */}
+			{/* Search + Category Row */}
 			<div className='flex flex-col sm:flex-row gap-3'>
-				<div className='flex-1 relative'>
-					<Search
-						className='absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground'
-						size={20}
-					/>
-					<input
-						placeholder='Search by name, description...'
-						onChange={(e) => debouncedSet(e.target.value)}
-						className='w-full pl-10 pr-4 py-2.5 border border-border bg-card text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all placeholder:text-muted-foreground'
-					/>
+				<div className='flex-1 relative flex gap-3 sm:items-center flex-col sm:flex-row'>
+					<div className='relative flex-1 w-full'>
+						<Search
+							className='absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground'
+							size={20}
+						/>
+						<input
+							placeholder='Search by name, description...'
+							onChange={(e) => debouncedSet(e.target.value)}
+							className='w-full pl-10 pr-4 py-2.5 border border-border bg-card text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all placeholder:text-muted-foreground h-10'
+						/>
+					</div>
+
+					<div className=''>
+						<Select value={categoryId} onValueChange={handleCategoryChange}>
+							<SelectTrigger className='h-10'>
+								<SelectValue placeholder='All categories' />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value='all'>All categories</SelectItem>
+								{categories?.map((c) => (
+									<SelectItem key={c.id} value={c.id}>
+										{c.name}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					</div>
 				</div>
-				<Button variant='outline'>
-					<Filter />
-					<span className='hidden sm:inline'>Filters</span>
-				</Button>
 			</div>
 
-			{/* Loading State */}
+			{/* Loading */}
 			{isLoading && (
 				<div className='flex items-center justify-center py-12'>
-					<div className='animate-spin rounded-full h-12 w-12 border-b-2 border-primary'></div>
+					<div className='animate-spin rounded-full h-12 w-12 border-b-2 border-primary' />
 				</div>
 			)}
 
-			{/* Error State */}
+			{/* Error */}
 			{isError && (
 				<div className='bg-destructive/10 border border-destructive/20 rounded-lg p-4 text-destructive'>
 					<p className='font-medium'>Error loading products</p>
@@ -122,7 +178,7 @@ export default function ProductsClient() {
 				</div>
 			)}
 
-			{/* Products Grid */}
+			{/* Grid */}
 			{!isLoading && !isError && (
 				<>
 					{list.length === 0 ? (
