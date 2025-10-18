@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import ConfirmDialog from '../shared/confirmDialog';
+import toast from 'react-hot-toast';
 
 export default function Sidebar() {
 	const dispatch = useDispatch();
@@ -38,17 +39,24 @@ export default function Sidebar() {
 		return pathname === path;
 	};
 
+	const handleLogout = () => {
+		dispatch(logout());
+		document.cookie = 'token=; path=/; max-age=0; samesite=lax';
+		toast.success('Logged out successfully');
+		window.location.href = '/login';
+	};
+
 	const SidebarContent = () => (
 		<>
 			{/* Logo Section */}
-			<div className='p-6 border-b border-slate-200'>
+			<div className='p-6 border-b border-border'>
 				<div className='flex items-center gap-3'>
-					<div className='w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center'>
-						<Package className='text-white' size={22} />
+					<div className='w-10 h-10 bg-primary rounded-lg flex items-center justify-center'>
+						<Package className='text-primary-foreground' size={22} />
 					</div>
 					<div>
-						<h2 className='text-lg font-bold text-slate-800'>Product Hunt</h2>
-						<p className='text-xs text-slate-500'>Management System</p>
+						<h2 className='text-lg font-bold text-foreground'>Product Hub</h2>
+						<p className='text-xs text-muted-foreground'>Management System</p>
 					</div>
 				</div>
 			</div>
@@ -59,8 +67,8 @@ export default function Sidebar() {
 					href='/products'
 					className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
 						isActive('/products')
-							? 'bg-blue-50 text-blue-700 font-medium'
-							: 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+							? 'bg-primary/10 text-primary font-medium'
+							: 'text-foreground/70 hover:bg-muted hover:text-foreground'
 					}`}
 				>
 					<LayoutGrid size={20} />
@@ -71,8 +79,8 @@ export default function Sidebar() {
 					href='/products/new'
 					className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
 						isActive('/products/new')
-							? 'bg-blue-50 text-blue-700 font-medium'
-							: 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+							? 'bg-primary/10 text-primary font-medium'
+							: 'text-foreground/70 hover:bg-muted hover:text-foreground'
 					}`}
 				>
 					<PlusSquare size={20} />
@@ -81,11 +89,11 @@ export default function Sidebar() {
 			</nav>
 
 			{/* Logout Button */}
-			<div className='p-4 border-t border-slate-200'>
+			<div className='p-4 border-t border-border'>
 				<Button
 					onClick={() => setLogoutOpen(true)}
 					variant='ghost'
-					className='w-full justify-start text-red-600 hover:bg-red-50 hover:text-red-700'
+					className='w-full justify-start text-destructive hover:bg-destructive/10 hover:text-destructive'
 				>
 					<LogOut size={20} />
 					<span className='font-medium'>Logout</span>
@@ -107,21 +115,21 @@ export default function Sidebar() {
 			</Button>
 
 			{/* Desktop Sidebar */}
-			<aside className='hidden lg:flex w-64 bg-white border-r border-slate-200 flex-col h-screen'>
+			<aside className='hidden lg:flex w-64 bg-card border-r border-border flex-col h-screen'>
 				<SidebarContent />
 			</aside>
 
 			{/* Mobile Sidebar Overlay */}
 			{isMobileMenuOpen && (
 				<div
-					className='fixed inset-0 bg-black/50 z-40 lg:hidden'
+					className='fixed inset-0 bg-foreground/50 z-40 lg:hidden'
 					onClick={() => setIsMobileMenuOpen(false)}
 				/>
 			)}
 
 			{/* Mobile Sidebar */}
 			<aside
-				className={`fixed top-0 left-0 z-50 w-64 bg-white border-r border-slate-200 flex flex-col h-screen transform transition-transform duration-300 lg:hidden ${
+				className={`fixed top-0 left-0 z-50 w-64 bg-card border-r border-border flex flex-col h-screen transform transition-transform duration-300 lg:hidden ${
 					isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
 				}`}
 			>
@@ -146,9 +154,7 @@ export default function Sidebar() {
 				confirmLabel='Log out'
 				cancelLabel='Cancel'
 				intent='default'
-				onConfirm={() => {
-					dispatch(logout());
-				}}
+				onConfirm={handleLogout}
 				onCancel={() => setLogoutOpen(false)}
 			/>
 		</>
